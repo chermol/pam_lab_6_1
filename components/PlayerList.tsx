@@ -3,12 +3,14 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
 import PlayerCard from './PlayerCard';
 import players from '../data/players';
+import { useResponsive } from '../hooks/useResponsive';
 
 const ROLES = ['All', 'Batter', 'Bowler', 'All Rounder', 'Wicket Keeper'];
 
 export default function PlayerList() {
   const router = useRouter();
   const { search, filter } = useLocalSearchParams();
+  const { isDesktop, width } = useResponsive();
   const [searchQuery, setSearchQuery] = useState((search as string) || '');
   const [selectedRole, setSelectedRole] = useState((filter as string) || 'All');
   const [filteredPlayers, setFilteredPlayers] = useState(players);
@@ -59,56 +61,81 @@ export default function PlayerList() {
     router.push(`/player/${originalIndex}`);
   };
 
+  // Calculate number of columns based on screen width
+  const getNumColumns = () => {
+    if (width >= 1440) return 4;
+    if (width >= 1024) return 3;
+    if (width >= 768) return 2;
+    return 1;
+  };
+
+  const numColumns = getNumColumns();
+
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search players..."
-          value={searchQuery}
-          onChangeText={handleSearchChange}
-          autoCapitalize="words"
-          autoCorrect={false}
-          clearButtonMode="while-editing"
-        />
-      </View>
-      <View style={styles.filterContainer}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterScrollContent}
-        >
-          {ROLES.map((role) => (
-            <TouchableOpacity
-              key={role}
-              style={[
-                styles.filterButton,
-                selectedRole === role && styles.filterButtonActive,
-              ]}
-              onPress={() => handleRoleFilter(role)}
-            >
-              <Text
+      <View style={[
+        styles.headerContainer,
+        isDesktop && styles.headerContainerDesktop
+      ]}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search players..."
+            value={searchQuery}
+            onChangeText={handleSearchChange}
+            autoCapitalize="words"
+            autoCorrect={false}
+            clearButtonMode="while-editing"
+          />
+        </View>
+        <View style={styles.filterContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterScrollContent}
+          >
+            {ROLES.map((role) => (
+              <TouchableOpacity
+                key={role}
                 style={[
-                  styles.filterButtonText,
-                  selectedRole === role && styles.filterButtonTextActive,
+                  styles.filterButton,
+                  selectedRole === role && styles.filterButtonActive,
                 ]}
+                onPress={() => handleRoleFilter(role)}
               >
-                {role}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+                <Text
+                  style={[
+                    styles.filterButtonText,
+                    selectedRole === role && styles.filterButtonTextActive,
+                  ]}
+                >
+                  {role}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
       </View>
       <FlatList
         data={filteredPlayers}
+        key={numColumns} // Force re-render when columns change
+        numColumns={numColumns}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
-          <PlayerCard
-            name={item.name}
-            onPress={() => handlePlayerPress(index)}
-          />
+          <View style={[
+            styles.cardWrapper,
+            { width: isDesktop ? `${100 / numColumns}%` : '100%' }
+          ]}>
+            <PlayerCard
+              name={item.name}
+              onPress={() => handlePlayerPress(index)}
+            />
+          </View>
         )}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          isDesktop && styles.listContentDesktop
+        ]}
       />
     </View>
   );
@@ -119,9 +146,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  headerContainer: {
+    backgroundColor: '#fff',
+  },
+  headerContainerDesktop: {
+    maxWidth: 1440,
+    alignSelf: 'center',
+    width: '100%',
+  },
   searchContainer: {
     padding: 16,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
@@ -165,7 +199,16 @@ const styles = StyleSheet.create({
   filterButtonTextActive: {
     color: '#fff',
   },
+  cardWrapper: {
+    padding: 0,
+  },
   listContent: {
     paddingVertical: 8,
+  },
+  listContentDesktop: {
+    paddingHorizontal: 16,
+    maxWidth: 1440,
+    alignSelf: 'center',
+    width: '100%',
   },
 });

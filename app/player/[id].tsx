@@ -1,10 +1,12 @@
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import players from '../../data/players';
+import { useResponsive } from '../../hooks/useResponsive';
 
 export default function PlayerDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { isDesktop } = useResponsive();
   const playerIndex = parseInt(id as string);
   const player = players[playerIndex];
 
@@ -24,7 +26,10 @@ export default function PlayerDetailScreen() {
         }}
       />
       <ScrollView style={styles.container}>
-        <View style={styles.content}>
+        <View style={[
+          styles.content,
+          isDesktop && styles.contentDesktop
+        ]}>
           <Image
             source={{ uri: player.image }}
             style={styles.image}
@@ -35,7 +40,10 @@ export default function PlayerDetailScreen() {
           <Text style={styles.style}>Role: {player.style}</Text>
 
           {player.stats && (
-            <View style={styles.statsContainer}>
+            <View style={[
+              styles.statsContainer,
+              isDesktop && styles.statsContainerDesktop
+            ]}>
               <Text style={styles.statsTitle}>Quick Stats</Text>
               <View style={styles.statsRow}>
                 <View style={styles.statItem}>
@@ -77,6 +85,13 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
+  contentDesktop: {
+    maxWidth: 800,
+    alignSelf: 'center',
+    width: '100%',
+    paddingHorizontal: 40,
+    paddingVertical: 40,
+  },
   image: {
     width: 200,
     height: 200,
@@ -108,6 +123,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     marginTop: 12,
+  },
+  statsContainerDesktop: {
+    maxWidth: 600,
   },
   statsTitle: {
     fontSize: 22,

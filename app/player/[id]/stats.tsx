@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import players from '../../../data/players';
+import { useResponsive } from '../../../hooks/useResponsive';
 
 export default function PlayerStatsScreen() {
   const { id } = useLocalSearchParams();
+  const { isDesktop } = useResponsive();
   const playerIndex = parseInt(id as string);
   const player = players[playerIndex];
 
@@ -25,93 +27,98 @@ export default function PlayerStatsScreen() {
         }}
       />
       <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <Image
-            source={{ uri: player.image }}
-            style={styles.playerImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.playerName}>{player.name}</Text>
-          <Text style={styles.playerRole}>{player.style}</Text>
-        </View>
+        <View style={[
+          styles.content,
+          isDesktop && styles.contentDesktop
+        ]}>
+          <View style={styles.header}>
+            <Image
+              source={{ uri: player.image }}
+              style={styles.playerImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.playerName}>{player.name}</Text>
+            <Text style={styles.playerRole}>{player.style}</Text>
+          </View>
 
-        <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Career Statistics</Text>
+          <View style={styles.statsSection}>
+            <Text style={styles.sectionTitle}>Career Statistics</Text>
 
-          <View style={styles.statCard}>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Total Matches</Text>
-              <Text style={styles.statValue}>{stats.matches}</Text>
+            <View style={styles.statCard}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Total Matches</Text>
+                <Text style={styles.statValue}>{stats.matches}</Text>
+              </View>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Total Runs</Text>
+                <Text style={styles.statValue}>{stats.runs}</Text>
+              </View>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Total Wickets</Text>
+                <Text style={styles.statValue}>{stats.wickets}</Text>
+              </View>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>
+                  {player.style === 'Bowler' ? 'Bowling Average' : 'Batting Average'}
+                </Text>
+                <Text style={styles.statValue}>{stats.average.toFixed(2)}</Text>
+              </View>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Strike Rate</Text>
+                <Text style={styles.statValue}>{stats.strikeRate.toFixed(2)}</Text>
+              </View>
             </View>
           </View>
 
-          <View style={styles.statCard}>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Total Runs</Text>
-              <Text style={styles.statValue}>{stats.runs}</Text>
-            </View>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Total Wickets</Text>
-              <Text style={styles.statValue}>{stats.wickets}</Text>
-            </View>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>
-                {player.style === 'Bowler' ? 'Bowling Average' : 'Batting Average'}
-              </Text>
-              <Text style={styles.statValue}>{stats.average.toFixed(2)}</Text>
-            </View>
-          </View>
-
-          <View style={styles.statCard}>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Strike Rate</Text>
-              <Text style={styles.statValue}>{stats.strikeRate.toFixed(2)}</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.performanceSection}>
-          <Text style={styles.sectionTitle}>Performance Metrics</Text>
-          
-          <View style={styles.metricCard}>
-            <Text style={styles.metricTitle}>Matches per Year</Text>
-            <Text style={styles.metricValue}>
-              {(stats.matches / 5).toFixed(1)}
-            </Text>
-            <Text style={styles.metricSubtext}>
-              Based on 5-year career average
-            </Text>
-          </View>
-
-          {stats.runs > 0 && (
+          <View style={styles.performanceSection}>
+            <Text style={styles.sectionTitle}>Performance Metrics</Text>
+            
             <View style={styles.metricCard}>
-              <Text style={styles.metricTitle}>Runs per Match</Text>
+              <Text style={styles.metricTitle}>Matches per Year</Text>
               <Text style={styles.metricValue}>
-                {(stats.runs / stats.matches).toFixed(1)}
+                {(stats.matches / 5).toFixed(1)}
               </Text>
               <Text style={styles.metricSubtext}>
-                Career average scoring rate
+                Based on 5-year career average
               </Text>
             </View>
-          )}
 
-          {stats.wickets > 0 && (
-            <View style={styles.metricCard}>
-              <Text style={styles.metricTitle}>Wickets per Match</Text>
-              <Text style={styles.metricValue}>
-                {(stats.wickets / stats.matches).toFixed(2)}
-              </Text>
-              <Text style={styles.metricSubtext}>
-                Career average wicket rate
-              </Text>
-            </View>
-          )}
+            {stats.runs > 0 && (
+              <View style={styles.metricCard}>
+                <Text style={styles.metricTitle}>Runs per Match</Text>
+                <Text style={styles.metricValue}>
+                  {(stats.runs / stats.matches).toFixed(1)}
+                </Text>
+                <Text style={styles.metricSubtext}>
+                  Career average scoring rate
+                </Text>
+              </View>
+            )}
+
+            {stats.wickets > 0 && (
+              <View style={styles.metricCard}>
+                <Text style={styles.metricTitle}>Wickets per Match</Text>
+                <Text style={styles.metricValue}>
+                  {(stats.wickets / stats.matches).toFixed(2)}
+                </Text>
+                <Text style={styles.metricSubtext}>
+                  Career average wicket rate
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
       </ScrollView>
     </>
@@ -122,6 +129,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
+  },
+  contentDesktop: {
+    maxWidth: 900,
+    alignSelf: 'center',
+    width: '100%',
   },
   header: {
     backgroundColor: '#fff',
