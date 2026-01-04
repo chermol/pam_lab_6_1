@@ -62,7 +62,17 @@ export default function PlayerList() {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-       View style={styles.filterContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search players..."
+          value={searchQuery}
+          onChangeText={handleSearchChange}
+          autoCapitalize="words"
+          autoCorrect={false}
+          clearButtonMode="while-editing"
+        />
+      </View>
+      <View style={styles.filterContainer}>
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
@@ -88,47 +98,6 @@ export default function PlayerList() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
-      < <TextInput
-          style={styles.searchInput}
-          placeholder="Search players..."
-          value={searchQuery}
-          onChangeText={handleSearchChange}
-          autoCapitalize="words"
-          autoCorrect={false}
-          clearButtonMode="while-editing"
-  filterContainer: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingVertical: 12,
-  },
-  filterScrollContent: {
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  filterButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginRight: 8,
-  },
-  filterButtonActive: {
-    backgroundColor: '#138808',
-    borderColor: '#138808',
-  },
-  filterButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  filterButtonTextActive: {
-    color: '#fff',
-  },
-        />
       </View>
       <FlatList
         data={filteredPlayers}
@@ -164,6 +133,37 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  filterContainer: {
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingVertical: 12,
+  },
+  filterScrollContent: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  filterButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginRight: 8,
+  },
+  filterButtonActive: {
+    backgroundColor: '#138808',
+    borderColor: '#138808',
+  },
+  filterButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+  },
+  filterButtonTextActive: {
+    color: '#fff',
   },
   listContent: {
     paddingVertical: 8,

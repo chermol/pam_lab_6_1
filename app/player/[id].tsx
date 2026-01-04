@@ -1,9 +1,10 @@
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import players from '../../data/players';
 
 export default function PlayerDetailScreen() {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
   const playerIndex = parseInt(id as string);
   const player = players[playerIndex];
 
@@ -32,6 +33,35 @@ export default function PlayerDetailScreen() {
           <Text style={styles.name}>{player.name}</Text>
           <Text style={styles.age}>Age: {player.age}</Text>
           <Text style={styles.style}>Role: {player.style}</Text>
+
+          {player.stats && (
+            <View style={styles.statsContainer}>
+              <Text style={styles.statsTitle}>Quick Stats</Text>
+              <View style={styles.statsRow}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{player.stats.matches}</Text>
+                  <Text style={styles.statLabel}>Matches</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{player.stats.runs}</Text>
+                  <Text style={styles.statLabel}>Runs</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statValue}>{player.stats.wickets}</Text>
+                  <Text style={styles.statLabel}>Wickets</Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.detailedStatsButton}
+                onPress={() => router.push(`/player/${id}/stats`)}
+              >
+                <Text style={styles.detailedStatsButtonText}>
+                  View Detailed Statistics
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </>
@@ -69,6 +99,52 @@ const styles = StyleSheet.create({
   style: {
     fontSize: 18,
     color: '#138808',
+    fontWeight: '600',
+    marginBottom: 24,
+  },
+  statsContainer: {
+    width: '100%',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    padding: 20,
+    marginTop: 12,
+  },
+  statsTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#138808',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  detailedStatsButton: {
+    backgroundColor: '#138808',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  detailedStatsButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: '600',
   },
 });
