@@ -1,15 +1,5 @@
-import { Stack } from 'expo-router';
-import PlayerList from '../components/PlayerList';
+import { Redirect } from 'expo-router';
 
 export default function HomeScreen() {
-  return (
-    <>
-      <Stack.Screen 
-        options={{ 
-          title: 'Indian Cricket Team',
-        }} 
-      />
-      <PlayerList />
-    </>
-  );
+  return <Redirect href="/(tabs)" />;
 }
