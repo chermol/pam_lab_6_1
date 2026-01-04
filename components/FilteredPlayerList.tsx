@@ -48,6 +48,7 @@ export default function FilteredPlayerList({ role }: FilteredPlayerListProps) {
             <PlayerCard
               name={item.name}
               onPress={() => handlePlayerPress(index)}
+              index={index}
             />
           </View>
         )}

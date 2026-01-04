@@ -1,7 +1,17 @@
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  withDelay,
+  withTiming
+} from 'react-native-reanimated';
 import players from '../../data/players';
 import { useResponsive } from '../../hooks/useResponsive';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 export default function PlayerDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -9,6 +19,43 @@ export default function PlayerDetailScreen() {
   const { isDesktop } = useResponsive();
   const playerIndex = parseInt(id as string);
   const player = players[playerIndex];
+
+  // Animation values
+  const imageScale = useSharedValue(0);
+  const imageOpacity = useSharedValue(0);
+  const contentOpacity = useSharedValue(0);
+  const contentTranslateY = useSharedValue(20);
+  const statsOpacity = useSharedValue(0);
+  const statsScale = useSharedValue(0.9);
+
+  useEffect(() => {
+    // Image animation
+    imageScale.value = withSpring(1, { damping: 12 });
+    imageOpacity.value = withTiming(1, { duration: 400 });
+
+    // Content animation (name, age, role)
+    contentOpacity.value = withDelay(200, withTiming(1, { duration: 400 }));
+    contentTranslateY.value = withDelay(200, withSpring(0, { damping: 15 }));
+
+    // Stats animation
+    statsOpacity.value = withDelay(400, withTiming(1, { duration: 400 }));
+    statsScale.value = withDelay(400, withSpring(1, { damping: 12 }));
+  }, []);
+
+  const imageAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: imageScale.value }],
+    opacity: imageOpacity.value,
+  }));
+
+  const contentAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: contentOpacity.value,
+    transform: [{ translateY: contentTranslateY.value }],
+  }));
+
+  const statsAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: statsOpacity.value,
+    transform: [{ scale: statsScale.value }],
+  }));
 
   if (!player) {
     return (
@@ -30,19 +77,22 @@ export default function PlayerDetailScreen() {
           styles.content,
           isDesktop && styles.contentDesktop
         ]}>
-          <Image
+          <AnimatedImage
             source={{ uri: player.image }}
-            style={styles.image}
+            style={[styles.image, imageAnimatedStyle]}
             resizeMode="contain"
           />
-          <Text style={styles.name}>{player.name}</Text>
-          <Text style={styles.age}>Age: {player.age}</Text>
-          <Text style={styles.style}>Role: {player.style}</Text>
+          <Animated.View style={contentAnimatedStyle}>
+            <Text style={styles.name}>{player.name}</Text>
+            <Text style={styles.age}>Age: {player.age}</Text>
+            <Text style={styles.style}>Role: {player.style}</Text>
+          </Animated.View>
 
           {player.stats && (
-            <View style={[
+            <Animated.View style={[
               styles.statsContainer,
-              isDesktop && styles.statsContainerDesktop
+              isDesktop && styles.statsContainerDesktop,
+              statsAnimatedStyle
             ]}>
               <Text style={styles.statsTitle}>Quick Stats</Text>
               <View style={styles.statsRow}>
@@ -68,7 +118,7 @@ export default function PlayerDetailScreen() {
                   View Detailed Statistics
                 </Text>
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           )}
         </View>
       </ScrollView>

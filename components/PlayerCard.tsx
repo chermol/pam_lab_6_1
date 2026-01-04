@@ -1,15 +1,39 @@
 import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect } from 'react';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring, 
+  withDelay 
+} from 'react-native-reanimated';
 
 interface PlayerCardProps {
   name: string;
   onPress: () => void;
+  index?: number;
 }
 
-export default function PlayerCard({ name, onPress }: PlayerCardProps) {
+export default function PlayerCard({ name, onPress, index = 0 }: PlayerCardProps) {
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(20);
+
+  useEffect(() => {
+    // Stagger animation based on index
+    opacity.value = withDelay(index * 50, withSpring(1, { damping: 15 }));
+    translateY.value = withDelay(index * 50, withSpring(0, { damping: 15 }));
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Text style={styles.name}>{name}</Text>
-    </TouchableOpacity>
+    <Animated.View style={animatedStyle}>
+      <TouchableOpacity style={styles.card} onPress={onPress}>
+        <Text style={styles.name}>{name}</Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 

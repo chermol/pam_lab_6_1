@@ -129,6 +129,7 @@ export default function PlayerList() {
             <PlayerCard
               name={item.name}
               onPress={() => handlePlayerPress(index)}
+              index={index}
             />
           </View>
         )}
